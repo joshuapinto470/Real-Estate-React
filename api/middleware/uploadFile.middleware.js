@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
 
     filename: (req, file, cb) => {
         const extension = file.originalname.split('.').pop();
-        const filename =  nanoid() + '.' + extension;
-        req.body.avatarFileName = 'http://localhost:3000/assets/' + filename;
+        const filename =  file.fieldname + '_' + nanoid() + '.' + extension;
+        // req.body.avatarFileName = 'http://localhost:3000/assets/' + filename;
         cb(null, filename);
     },
 });

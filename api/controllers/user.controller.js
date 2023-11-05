@@ -3,8 +3,9 @@ import User from '../models/user.model.js';
 
 export const updateUser = async (req, res, next) => {
     try {
-        console.log(JSON.stringify(req.body));
         const userId = req.user.id;
+        console.log(req.file.filename);
+        const avatarFileName = 'http://localhost:3000/assets/' + req.file.filename;
         if(req.body.password) {
             req.body.password = bcryptjs.hashSync(req.body.password, 10);
         }
@@ -14,7 +15,7 @@ export const updateUser = async (req, res, next) => {
                 username: req.body.username,
                 email: req.body.email,
                 password: req.body.password,
-                avatar: req.body.avatarFileName,
+                avatar: avatarFileName,
             }
         }, {runValidators: true, new: true});
 

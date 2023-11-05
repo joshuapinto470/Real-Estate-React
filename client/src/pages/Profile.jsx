@@ -50,6 +50,7 @@ const Profile = () => {
 
   const handleSignOut = async () => {
     if (loading) return;
+    console.log('loggin out')
     try {
       dispatch(userUpdateStart());
       const res = await fetch('/api/auth/signout');

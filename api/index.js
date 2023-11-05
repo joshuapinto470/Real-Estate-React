@@ -22,7 +22,10 @@ mongoose.connect(process.env.MONGO_CONNECTION).then(() => {
 });
 
 const app = express();
-app.use(express.json());
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "30mb", extended: true }));
+app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));

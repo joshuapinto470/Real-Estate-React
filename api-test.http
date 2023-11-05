@@ -1,0 +1,122 @@
+### SIGNIN
+POST /api/auth/signin HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+
+{
+    "username" : "JoshuaTest",
+    "email" : "testemail@test.com",
+    "password" : "testpassword"
+}
+
+### SIGNUP
+
+POST /api/auth/signup HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+
+{
+    "username" : "admin",
+    "email" : "admin1@admin.com",
+    "password" : "admin"
+}
+
+### Create Listing
+
+POST /api/listing/create HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MzE0ZjhmOGFhZTkzZDRhNDFhOGNiMSIsImlhdCI6MTY5ODkzMTExM30.YkjFlnHkG4fsu1inN4jOze35e3JqOcTNGS-aVgA_U5w
+
+{
+    "name" : "Beach Front Condo",
+    "description": "With view to palm beach",
+    "address" : "FL",
+    "regularPrice" : 5000,
+    "discountPrice" : 3,
+    "bathrooms" : 0,
+    "bedrooms" : 1,
+    "furnished" : true,
+    "parking" : false,
+    "type" : "rent",
+    "offer" : false,
+    "imageUrls" : [],
+    "userRef" : "testurl"
+}
+
+###
+
+POST /api/listing/create HTTP/1.1
+Host: localhost:3000
+Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MzE0ZjhmOGFhZTkzZDRhNDFhOGNiMSIsImlhdCI6MTY5ODkzMTExM30.YkjFlnHkG4fsu1inN4jOze35e3JqOcTNGS-aVgA_U5w
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+River View Apts
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+Nice View
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="address"
+
+C.A
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="regularPrice"
+
+5000
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="discountPrice"
+
+4999
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="bathrooms"
+
+0
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="bedrooms"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="furnished"
+
+true
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="parking"
+
+false
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="type"
+
+rent
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="offer"
+
+false
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="userRef"
+
+testurl
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="gallery"; filename="/E:/Pictures/S/32178463_208092689990632_5779342705423286272_n.jpg"
+Content-Type: image/jpeg
+
+(data)
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="gallery"; filename="/E:/Pictures/S/118154512_759529231534043_7362095315496077452_n.jpg"
+Content-Type: image/jpeg
+
+(data)
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="gallery"; filename="/E:/Pictures/S/118248219_950638555401011_3794138877495041221_n.jpg"
+Content-Type: image/jpeg
+
+(data)
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="gallery"; filename="/E:/Pictures/S/118288962_769240253901023_4985793803747486391_n.jpg"
+Content-Type: image/jpeg
+
+(data)
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
