@@ -29,6 +29,10 @@ export const updateUser = async (req, res, next) => {
             { runValidators: true, new: true }
         ).lean();
 
+        if (!updateUser) {
+            return next(errorHandler(400, 'User not found!'));
+        }
+
         const { password, ...rest } = updateUser;
         res.status(200).json({
             success: true,

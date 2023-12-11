@@ -33,7 +33,7 @@ const SignIn = () => {
             });
 
             const data = await res.json();
-            if (res.status >= 400) {
+            if (!res.ok) {
                 console.log(res);
                 throw new Error("Error request: " + res.status);
             }
