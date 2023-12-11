@@ -21,7 +21,7 @@ with open('MOCK_DATA.csv', mode='r', encoding="utf-8") as file:
             "parking": lines[8],
             "type": "rent" if lines[9] else "sell",
             "offer": lines[10],
-            "userRef": lines[11],
+            "userRef": '6533e6f19b26dc1acfeafe3d',
         }
 
         r = rq.post(url, data=data, files=files)

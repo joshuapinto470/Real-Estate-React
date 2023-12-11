@@ -5,8 +5,8 @@ Content-Type: application/json
 
 {
     "username" : "JoshuaTest",
-    "email" : "testemail@test.com",
-    "password" : "testpassword"
+    "email" : "user@user.com",
+    "password" : "user"
 }
 
 ### SIGNUP
@@ -40,7 +40,6 @@ Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MzE0ZjhmOG
     "parking" : false,
     "type" : "rent",
     "offer" : false,
-    "imageUrls" : [],
     "userRef" : "testurl"
 }
 
@@ -54,7 +53,7 @@ Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0g
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="name"
 
-River View Apts
+Sun Apts
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="description"
 
