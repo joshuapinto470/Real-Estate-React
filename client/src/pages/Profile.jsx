@@ -1,3 +1,4 @@
+import React from "react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
@@ -73,12 +74,12 @@ const Profile = () => {
     const showListings = async () => {
         try {
             const res = await fetch("/api/user/listings");
-            const data = await res.json();
-            if (data.success === false) {
+            if (!res.ok) {
                 console.warn(data);
                 return;
             }
-
+            
+            const data = await res.json();
             console.log(data);
             setListings(data.data);
         } catch (error) {

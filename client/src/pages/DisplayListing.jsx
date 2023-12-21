@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,6 +39,7 @@ const TableListing = ({ listings }) => (
                     )}
                     {l.imageUrls.map((url) => (
                         <img
+                            key={url}
                             src={url}
                             alt="profile"
                             className="h-24 w-30 object-cover cursor-pointer self-center mt-2 mx-2"
@@ -75,7 +78,7 @@ const DisplayListing = () => {
             };
 
             const res = await fetch("/api/listing/fetch-listing", options);
-            if (res.status >= 400) {
+            if (!res.ok) {
                 switch (res.status) {
                     case 401:
                     case 403:
@@ -84,7 +87,6 @@ const DisplayListing = () => {
                     default:
                         console.warn(res);
                         throw new Error("Error request " + res.status);
-                        break;
                 }
 
                 // throw new Error("Error request: " + res.status);

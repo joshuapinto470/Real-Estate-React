@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+import React from "react";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
 
@@ -9,6 +11,7 @@ export const ListingCard = ({ listing, listingDeleteHandler }) => {
                     className="p-8 rounded-t-lg"
                     src={listing.imageUrls[0]}
                     alt="product image"
+                    loading="lazy"
                 />
             </a>
             <div className="px-5 pb-5">
