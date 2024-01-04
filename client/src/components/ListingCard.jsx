@@ -6,14 +6,14 @@ import { Link } from "react-router-dom";
 export const ListingCard = ({ listing, listingDeleteHandler }) => {
     return (
         <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 pt-2 m-auto">
-            <a href="#">
+            <Link to={`/listing/${listing._id}`}>
                 <img
                     className="p-8 rounded-t-lg"
                     src={listing.imageUrls[0]}
                     alt="product image"
                     loading="lazy"
                 />
-            </a>
+            </Link>
             <div className="px-5 pb-5">
                 <a href="#" className="flex gap-2 items-center mb-5">
                     <h5 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">

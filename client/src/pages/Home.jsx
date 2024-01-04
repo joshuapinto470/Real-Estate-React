@@ -24,7 +24,7 @@ const Home = () => {
                 to={"/search"}
                 className="text-xs sm:text-sm text-blue-800 font-bold hover:underline"
             >
-                Let's get started...
+                Let&apos;s get started...
             </Link>
 
             <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10">

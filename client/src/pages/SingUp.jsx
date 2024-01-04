@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -84,7 +85,7 @@ const SingUp = () => {
                     <span className="text-blue-700">Sing in</span>
                 </Link>
             </div>
-            {error && <p className="text-red-500 mt-5">{error}</p>}
+            {error && <p className="text-red-500 mt-5">{error?.message}</p>}
         </div>
     );
 };

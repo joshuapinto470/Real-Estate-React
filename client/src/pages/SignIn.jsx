@@ -80,7 +80,7 @@ const SignIn = () => {
                     <span className="text-blue-700">Sing up</span>
                 </Link>
             </div>
-            {error && <p className="text-red-500 mt-5 text-center">{error}</p>}
+            {error && <p className="text-red-500 mt-5 text-center">{error?.message}</p>}
         </div>
     );
 };

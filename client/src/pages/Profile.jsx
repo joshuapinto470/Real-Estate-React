@@ -10,6 +10,11 @@ import {
     userDeleteFailure,
     userDeleteSuccess,
 } from "../redux/user/userSlice.js";
+import {
+    loadFailure,
+    loadStart,
+    loadSuccess,
+} from "../redux/listings/listingSlice.js";
 
 const Profile = () => {
     const { currentUser } = useSelector((state) => state.user);
@@ -19,6 +24,9 @@ const Profile = () => {
     const [formData, setFormData] = useState({});
     const [listings, setListings] = useState([]);
     const { loading, error } = useSelector((state) => state.user);
+    const { ListingLoading, ListingError } = useSelector(
+        (state) => state.listing
+    );
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -72,18 +80,25 @@ const Profile = () => {
     };
 
     const showListings = async () => {
+        if (ListingLoading) return;
         try {
+            dispatch(loadStart());
             const res = await fetch("/api/user/listings");
             if (!res.ok) {
-                console.warn(data);
+                dispatch(
+                    loadFailure({ message: "Network response was not OK" })
+                );
                 return;
+                // throw new Error({ message : "Network response was not OK"});
             }
-            
+
             const data = await res.json();
             console.log(data);
             setListings(data.data);
+            dispatch(loadSuccess(data.data));
         } catch (error) {
             console.error(error);
+            dispatch(loadFailure(error));
         }
     };
 
@@ -132,7 +147,7 @@ const Profile = () => {
             const res = await fetch("/api/user/updateUser", options);
             const data = await res.json();
             if (data.success === false) {
-                dispatch(userUpdateFailure(data));
+                dispatch(userUpdateFailure({ message: data }));
                 return;
             }
             dispatch(userUpdateSuccess(data));
@@ -146,7 +161,7 @@ const Profile = () => {
             <h1 className="text-3xl font-semibold text-center my-7 truncate">
                 Hello 👋 {user.username}!
             </h1>
-            <form className="flex flex-col gap-4" onSubmit={handleFormSubmit}>
+            <form className="flex flex-col gap-4" onSubmit={handleFormSubmit} id="user-form">
                 <input
                     onChange={(e) => handleAvatarUpload(e.target.files[0])}
                     type="file"
@@ -209,13 +224,15 @@ const Profile = () => {
                     Sign Out
                 </span>
             </div>
-            {error && (
-                <p className="text-center">Error: {error.message?.message}</p>
+            {(error || ListingError) && (
+                <p className="bg-red-500 p-3 text-white rounded-md">
+                    {error?.message?.message || ListingError?.message}
+                </p>
             )}
-            <button className="text-green-700 w-full" onClick={showListings}>
-                Show Listing
+            <button className="text-slate-100 w-full p-3 bg-blue-600 rounded-md my-2" onClick={showListings}>
+                <p className="uppercase">Show Listings</p>
             </button>
-            {listings && listings.length > 0 && (
+            {listings && listings.length > 0 ? (
                 <div className="flex flex-col gap-4">
                     <h1 className="text-center mt-7 text-2xl font-semibold">
                         Your Listings
@@ -228,7 +245,7 @@ const Profile = () => {
                         />
                     ))}
                 </div>
-            )}
+            ) : <p className="text-center mt-3">You have no listings. Create a Listing to be displayed here.</p>}
         </div>
     );
 };
