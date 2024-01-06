@@ -78,7 +78,9 @@ const UpdateListing = () => {
 
     const handleRemoveImage = (index) => {};
 
-    const handleSubmit = async (e) => {};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    };
 
     return (
         <main className="p-3 max-w-4xl mx-auto">
