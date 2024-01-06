@@ -2,6 +2,7 @@ import { isValidObjectId } from "mongoose";
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
 import { validateListingSchema } from "../validators/listing.validator.js";
+import jwt from 'jsonwebtoken';
 
 export const createListing = async (req, res, next) => {
     try {
@@ -45,7 +46,20 @@ export const getListing = async (req, res, next) => {
         }
 
         const listing = await Listing.findById(req.params.listingId);
-        const userId = req.user?.id;
+        /*
+        See if this is a authenticated request.
+        If so then set the isEditable flag to true if the post belongs 
+        to the current user.
+        */
+        let userId = null;
+        const token = req.cookies?.access_token;
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+                if (!err) {
+                    userId = user.id;
+                } 
+            })
+        }
         if (!listing) return next(errorHandler(404, "Listing Not Found!"));
 
         // listing['isEditable'] = listing.userRef !== userId;
@@ -73,6 +87,10 @@ export const fetchListing = async (req, res, next) => {
     }
 };
 
+/*
+Delets the user listing.
+This currently does not delete the images associated with the listing ;(
+*/
 export const deleteListing = async (req, res, next) => {
     try {
         if (!isValidObjectId(req.params.listingId)) {
