@@ -11,7 +11,7 @@ export const createListing = async (req, res, next) => {
         console.log(value);
         if (error) {
             console.log(error);
-            return next(errorHandler(400, error.details[0].message));
+            return next(errorHandler(400, error.details[0].message, '/listing/create'));
         }
         // req.user.id = "TEST ID"
 
@@ -23,7 +23,7 @@ export const createListing = async (req, res, next) => {
                 imageUrls.push("http://localhost:3000/assets/" + i.filename);
             });
         } else {
-            return next(errorHandler(500, "No images uploaded"));
+            return next(errorHandler(500, "No images uploaded", '/listing/create'));
         }
 
         value.imageUrls = imageUrls;

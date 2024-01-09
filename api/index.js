@@ -10,6 +10,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 import path from "path";
+import { errorHandlerMiddleware } from "./middleware/errorHandler.middleware.js";
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -36,21 +37,29 @@ app.use(cookieParser());
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "../public/assets")));
 
-app.listen(3000, () => {
-    console.log("server running on :3000");
-});
-
+// Routes
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 
-app.use((err, req, res, next) => {
-    console.log(err);
-    const statusCode = err.statusCode || 500;
-    const message = err || "Internal Server Error";
-    return res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message,
-    });
+app.get('/api/dev/health', (req, res) => {
+    try {
+        res.status(200).json({db: mongoose.STATES[mongoose.connection.readyState]})
+    } catch (error) {
+        console.log(error);
+    }
 });
+
+// Error handler
+app.use(errorHandlerMiddleware);
+
+const server = app.listen(3000, () => {
+    console.log('MongoDB: ' + mongoose.STATES[mongoose.connection.readyState]);
+    console.log("server running on :3000");
+});
+
+process.on('SIGTERM', () => {
+    console.debug("Server shutting down [SIGTERM]");
+    server.close(() => {console.debug('HTTP Server closed')});
+    mongoose.disconnect();
+})
