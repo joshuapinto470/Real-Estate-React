@@ -1,253 +1,307 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { ListingCard } from "../components/ListingCard.jsx";
 import {
-    userUpdateStart,
-    userUpdateSuccess,
-    userUpdateFailure,
-    userDeleteFailure,
-    userDeleteSuccess,
+  userUpdateStart,
+  userUpdateSuccess,
+  userUpdateFailure,
+  userDeleteFailure,
+  userDeleteSuccess,
 } from "../redux/user/userSlice.js";
 import {
-    loadFailure,
-    loadStart,
-    loadSuccess,
+  loadFailure,
+  loadStart,
+  loadSuccess,
 } from "../redux/listings/listingSlice.js";
 
 const Profile = () => {
-    const { currentUser } = useSelector((state) => state.user);
-    const user = currentUser.user;
-    const fileRef = useRef(null);
-    const [file, setFile] = useState(undefined);
-    const [formData, setFormData] = useState({});
-    const [listings, setListings] = useState([]);
-    const { loading, error } = useSelector((state) => state.user);
-    const { ListingLoading, ListingError } = useSelector(
-        (state) => state.listing
-    );
+  const { currentUser } = useSelector((state) => state.user);
+  const user = currentUser.user;
+  const fileRef = useRef(null);
+  const [file, setFile] = useState(undefined);
+  const [formData, setFormData] = useState({});
+  const [listings, setListings] = useState([]);
+  const [uploadSuccess, setuploadSuccess] = useState(null);
+  const { loading, error } = useSelector((state) => state.user);
+  const [passMatch, setPassMatch] = useState(null);
+  const { ListingLoading, ListingError } = useSelector(
+    (state) => state.listing
+  );
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-    };
+  useEffect(() => {
+    if (!formData.password) {
+      setPassMatch(false);
+      return;
+    }
+    if (formData.password !== formData.password_confirm) {
+      setPassMatch("unmatch");
+    } else {
+      setPassMatch("match");
+    }
+  }, [formData]);
 
-    const handleAvatarUpload = (file) => {
-        setFile(file);
-        setFormData({ ...formData, avatar: URL.createObjectURL(file) });
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
-    const handleDeleteUser = async () => {
-        if (loading) return;
-        try {
-            dispatch(userUpdateStart());
-            const options = {
-                method: "DELETE",
-            };
+  const handleAvatarUpload = (file) => {
+    setFile(file);
+    setFormData({ ...formData, avatar: URL.createObjectURL(file) });
+  };
 
-            const res = await fetch("api/user/deleteUser", options);
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(userDeleteFailure(data));
-                return;
-            }
-            dispatch(userDeleteSuccess());
-            navigate("/");
-        } catch (error) {
-            dispatch(userDeleteFailure(error));
-        }
-    };
+  const handleDeleteUser = async () => {
+    if (loading) return;
+    try {
+      dispatch(userUpdateStart());
+      const options = {
+        method: "DELETE",
+      };
 
-    const handleListingDelete = async (id) => {
-        try {
-            const res = await fetch(`/api/listing/delete-listing/${id}`, {
-                method: "DELETE",
-            });
+      const res = await fetch("api/user/deleteUser", options);
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(userDeleteFailure(data));
+        return;
+      }
+      dispatch(userDeleteSuccess());
+      navigate("/");
+    } catch (error) {
+      dispatch(userDeleteFailure(error));
+    }
+  };
 
-            const data = await res.json();
-            if (data.success === false) {
-                console.error(data);
-                return;
-            }
+  const handleListingDelete = async (id) => {
+    try {
+      const res = await fetch(`/api/listing/delete-listing/${id}`, {
+        method: "DELETE",
+      });
 
-            setListings((prev) => prev.filter((listing) => listing._id !== id));
-        } catch (error) {
-            console.log(error);
-        }
-    };
+      const data = await res.json();
+      if (data.success === false) {
+        console.error(data);
+        return;
+      }
 
-    const showListings = async () => {
-        if (ListingLoading) return;
-        try {
-            dispatch(loadStart());
-            const res = await fetch("/api/user/listings");
-            if (!res.ok) {
-                dispatch(
-                    loadFailure({ message: "Network response was not OK" })
-                );
-                return;
-                // throw new Error({ message : "Network response was not OK"});
-            }
+      setListings((prev) => prev.filter((listing) => listing._id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-            const data = await res.json();
-            console.log(data);
-            setListings(data.data);
-            dispatch(loadSuccess(data.data));
-        } catch (error) {
-            console.error(error);
-            dispatch(loadFailure(error));
-        }
-    };
+  const showListings = async () => {
+    if (ListingLoading) return;
+    try {
+      dispatch(loadStart());
+      const res = await fetch("/api/user/listings");
+      if (!res.ok) {
+        dispatch(loadFailure({ message: "Network response was not OK" }));
+        return;
+        // throw new Error({ message : "Network response was not OK"});
+      }
 
-    const handleSignOut = async () => {
-        if (loading) return;
-        console.log("loggin out");
-        try {
-            dispatch(userUpdateStart());
-            const res = await fetch("/api/auth/signout");
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(userDeleteFailure(data.message));
-                return;
-            }
-            dispatch(userDeleteSuccess());
-            navigate("/");
-        } catch (error) {
-            dispatch(userDeleteFailure(error));
-        }
-    };
+      const data = await res.json();
+      console.log(data);
+      setListings(data.data);
+      dispatch(loadSuccess(data.data));
+    } catch (error) {
+      console.error(error);
+      dispatch(loadFailure(error));
+    }
+  };
 
-    const handleFormSubmit = async (e) => {
-        if (loading) return;
-        e.preventDefault();
-        try {
-            // Upload form to server.
-            dispatch(userUpdateStart());
-            const multipartData = new FormData();
+  const handleSignOut = async () => {
+    if (loading) return;
+    console.log("loggin out");
+    try {
+      dispatch(userUpdateStart());
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(userDeleteFailure(data.message));
+        return;
+      }
+      dispatch(userDeleteSuccess());
+      navigate("/");
+    } catch (error) {
+      dispatch(userDeleteFailure(error));
+    }
+  };
 
-            formData.email && multipartData.append("email", formData.email);
+  const handleFormSubmit = async (e) => {
+    if (loading) return;
+    e.preventDefault();
+    try {
+      // Upload form to server.
+      if (formData.password !== formData.password_confirm) {
+        setPassMatch("no-match");
+        setTimeout(() => {
+            setPassMatch(null);
+          }, 2000);
+        return;
+      }
+      setPassMatch("match");
+      setTimeout(() => {
+        setPassMatch(null);
+      }, 2000);
+      dispatch(userUpdateStart());
+      const multipartData = new FormData();
 
-            formData.username &&
-                multipartData.append("username", formData.username);
+      formData.email && multipartData.append("email", formData.email);
 
-            formData.password &&
-                multipartData.append("password", formData.password);
+      formData.username && multipartData.append("username", formData.username);
 
-            file && multipartData.append("avatar", file);
+      formData.password && multipartData.append("password", formData.password);
 
-            const options = {
-                method: "POST",
-                credentials: "include",
-                body: multipartData,
-            };
+      file && multipartData.append("avatar", file);
 
-            const res = await fetch("/api/user/updateUser", options);
-            const data = await res.json();
-            if (data.success === false) {
-                dispatch(userUpdateFailure({ message: data }));
-                return;
-            }
-            dispatch(userUpdateSuccess(data));
-        } catch (error) {
-            dispatch(userUpdateFailure(error));
-        }
-    };
+      const options = {
+        method: "POST",
+        credentials: "include",
+        body: multipartData,
+      };
 
-    return (
-        <div className="p-3 max-w-lg mx-auto">
-            <h1 className="text-3xl font-semibold text-center my-7 truncate">
-                Hello 👋 {user.username}!
-            </h1>
-            <form className="flex flex-col gap-4" onSubmit={handleFormSubmit} id="user-form">
-                <input
-                    onChange={(e) => handleAvatarUpload(e.target.files[0])}
-                    type="file"
-                    ref={fileRef}
-                    hidden
-                    accept="image/*"
-                />
-                <img
-                    onClick={() => fileRef.current.click()}
-                    src={formData.avatar || user.avatar}
-                    alt="profile"
-                    className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
-                />
+      const res = await fetch("/api/user/updateUser", options);
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(userUpdateFailure({ message: data }));
+        return;
+      }
+      dispatch(userUpdateSuccess(data));
+      setFormData({});
+      setuploadSuccess(true);
+      setTimeout(() => {
+        setuploadSuccess(false);
+      }, 3500);
+    } catch (error) {
+      dispatch(userUpdateFailure(error));
+    }
+  };
 
-                <input
-                    type="text"
-                    placeholder={user.username}
-                    id="username"
-                    className="border p-3 rounded-lg mt-2"
-                    onChange={handleChange}
-                ></input>
-                <input
-                    type="email"
-                    placeholder={user.email}
-                    id="email"
-                    className="border p-3 rounded-lg mt-2"
-                    onChange={handleChange}
-                ></input>
-                <input
-                    type="password"
-                    placeholder="Change Password"
-                    id="password"
-                    className="border p-3 rounded-lg mt-2"
-                    onChange={handleChange}
-                ></input>
-                <button
-                    disabled={loading}
-                    className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
-                >
-                    Update
-                </button>
-                <Link
-                    className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"
-                    to="/create-listing"
-                >
-                    Create Listing
-                </Link>
-            </form>
-            <div className="flex justify-between mt-5">
-                <span
-                    onClick={handleDeleteUser}
-                    className="text-red-700 cursor-pointer hover:bg-red-700 hover:text-white p-2 rounded-lg"
-                >
-                    Delete Account
-                </span>
-                <span
-                    onClick={handleSignOut}
-                    className="text-red-700 cursor-pointer hover:bg-blue-500 hover:text-white p-2 rounded-lg"
-                >
-                    Sign Out
-                </span>
-            </div>
-            {(error || ListingError) && (
-                <p className="bg-red-500 p-3 text-white rounded-md">
-                    {error?.message?.message || ListingError?.message}
-                </p>
-            )}
-            <button className="text-slate-100 w-full p-3 bg-blue-600 rounded-md my-2" onClick={showListings}>
-                <p className="uppercase">Show Listings</p>
-            </button>
-            {listings && listings.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                    <h1 className="text-center mt-7 text-2xl font-semibold">
-                        Your Listings
-                    </h1>
-                    {listings.map((listing) => (
-                        <ListingCard
-                            key={listing._id}
-                            listing={listing}
-                            listingDeleteHandler={handleListingDelete}
-                        />
-                    ))}
-                </div>
-            ) : <p className="text-center mt-3">You have no listings. Create a Listing to be displayed here.</p>}
+  return (
+    <div className="p-3 max-w-lg mx-auto">
+      <h1 className="text-3xl font-semibold text-center my-7 truncate">
+        Hello, {user.username}! 👋
+      </h1>
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={handleFormSubmit}
+        id="user-form">
+        <input
+          onChange={(e) => handleAvatarUpload(e.target.files[0])}
+          type="file"
+          ref={fileRef}
+          hidden
+          accept="image/*"
+        />
+        <img
+          onClick={() => fileRef.current.click()}
+          src={formData.avatar || user.avatar}
+          alt="profile"
+          className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
+        />
+
+        <input
+          type="text"
+          placeholder={user.username}
+          id="username"
+          className="border p-3 rounded-full mt-2 hover:shadow-md"
+          onChange={handleChange}></input>
+        <input
+          type="email"
+          placeholder={user.email}
+          id="email"
+          className="border p-3 rounded-full mt-2 hover:shadow-md"
+          onChange={handleChange}></input>
+        <input
+          type="password"
+          placeholder="Change Password"
+          id="password"
+          className="border p-3 rounded-full mt-2 hover:shadow-md"
+          onChange={handleChange}></input>
+        {formData.password && (
+          <input
+            type="password_confirm"
+            placeholder="Confirm Password"
+            id="password_confirm"
+            className="border p-3 rounded-full mt-2 sm:hover:shadow-md"
+            onChange={handleChange}></input>
+        )}
+
+        {passMatch &&
+          (passMatch === "match" ? (
+            <p className="text-center p-2 bg-green-600 text-white rounded-md text-lg">
+              Matches
+            </p>
+          ) : (
+            <p className="text-center p-2 bg-red-600 text-white rounded-md text-lg">
+              Password does not match
+            </p>
+          ))}
+        {uploadSuccess && (
+          <p className="text-center p-2 bg-green-500 rounded-md text-lg text-white">
+            Upload Success
+          </p>
+        )}
+        <div className="flex justify-evenly">
+          <button
+            disabled={loading}
+            className="bg-slate-700 text-white rounded-full p-3 uppercase hover:opacity-95 disabled:opacity-80 hover:shadow-md">
+            Update User
+          </button>
+          <Link
+            className="bg-green-700 text-white p-3 rounded-full uppercase text-center hover:opacity-95 hover:shadow-md transition-all"
+            to="/create-listing">
+            Create Listing
+          </Link>
         </div>
-    );
+      </form>
+      <div className="flex justify-between mt-5">
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer hover:bg-red-700 hover:text-white p-2 rounded-lg">
+          Delete Account
+        </span>
+        <span
+          onClick={handleSignOut}
+          className="text-red-700 cursor-pointer hover:bg-blue-500 hover:text-white p-2 rounded-lg">
+          Sign Out
+        </span>
+      </div>
+      {(error || ListingError) && (
+        <p className="bg-red-500 p-3 text-white rounded-md">
+          {error?.message?.message || ListingError?.message}
+        </p>
+      )}
+      <button
+        className="text-slate-100 w-full p-3 bg-blue-600 rounded-md my-2"
+        onClick={showListings}>
+        <p className="uppercase">Show Listings</p>
+      </button>
+      {listings && listings.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          <h1 className="text-center mt-7 text-2xl font-semibold">
+            Your Listings
+          </h1>
+          {listings.map((listing) => (
+            <ListingCard
+              key={listing._id}
+              listing={listing}
+              listingDeleteHandler={handleListingDelete}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center mt-3">
+          Your Loaded listings will be displayed here.
+        </p>
+      )}
+    </div>
+  );
 };
 
 export default Profile;

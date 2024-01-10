@@ -16,14 +16,16 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const PORT = process.env.PORT || 3000;
+
 mongoose
-    .connect(process.env.MONGO_CONNECTION)
-    .then(() => {
-        console.log("connected to mongodb");
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+  .connect(process.env.MONGO_CONNECTION)
+  .then(() => {
+    console.log("connected to mongodb");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 const app = express();
 // app.use(express.json());
@@ -42,24 +44,37 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 
-app.get('/api/dev/health', (req, res) => {
-    try {
-        res.status(200).json({db: mongoose.STATES[mongoose.connection.readyState]})
-    } catch (error) {
-        console.log(error);
-    }
+app.get("/api/dev/health", (req, res) => {
+  try {
+    res
+      .status(200)
+      .json({ db: mongoose.STATES[mongoose.connection.readyState] });
+  } catch (error) {
+    console.log(error);
+  }
 });
+
+app.get("/", (req, res) =>
+  res
+    .status(200)
+    .json({
+      message: "server running..",
+      db: mongoose.STATES[mongoose.connection.readyState],
+    })
+);
 
 // Error handler
 app.use(errorHandlerMiddleware);
 
-const server = app.listen(3000, () => {
-    console.log('MongoDB: ' + mongoose.STATES[mongoose.connection.readyState]);
-    console.log("server running on :3000");
+const server = app.listen(PORT, () => {
+  console.log("MongoDB: " + mongoose.STATES[mongoose.connection.readyState]);
+  console.log(`server running on http://localhost:${PORT}`);
 });
 
-process.on('SIGTERM', () => {
-    console.debug("Server shutting down [SIGTERM]");
-    server.close(() => {console.debug('HTTP Server closed')});
-    mongoose.disconnect();
-})
+process.on("SIGTERM", () => {
+  console.debug("Server shutting down [SIGTERM]");
+  server.close(() => {
+    console.debug("HTTP Server closed");
+  });
+  mongoose.disconnect();
+});
