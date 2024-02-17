@@ -1,7 +1,10 @@
-import { isValidObjectId } from "mongoose";
+import { MongooseError, isValidObjectId } from "mongoose";
 import Listing from "../models/listing.model.js";
 import { errorHandler } from "../utils/error.js";
-import { validateListingSchema } from "../validators/listing.validator.js";
+import {
+  validateListingSchema,
+  validateUpdateListingSchema,
+} from "../validators/listing.validator.js";
 import jwt from "jsonwebtoken";
 import { uploadToFirebase } from "../utils/firebase_storage_upload.js";
 
@@ -39,18 +42,21 @@ export const createListing = async (req, res, next) => {
 
     return res.status(201).json({ success: true, data: listing });
   } catch (error) {
+    if (error instanceof MongooseError) {
+      next(errorHandler(500, "Mongo Server Error", "/auth/signin"));
+    }
     next(error);
   }
 };
 
 /*
-    // if (Array.isArray(images)) {
-    //     images.forEach((i) => {
-    //         imageUrls.push("http://localhost:3000/assets/" + i.filename);
-    //     });
-    // } else {
-    //     return next(errorHandler(500, "No images uploaded", '/listing/create'));
-    // }
+    if (Array.isArray(images)) {
+        images.forEach((i) => {
+            imageUrls.push("http://localhost:3000/assets/" + i.filename);
+        });
+    } else {
+        return next(errorHandler(500, "No images uploaded", '/listing/create'));
+    }
 */
 
 // Get a single listing
@@ -65,7 +71,7 @@ export const getListing = async (req, res, next) => {
         See if this is a authenticated request.
         If so then set the isEditable flag to true if the post belongs 
         to the current user.
-        */
+    */
     let userId = null;
     const token = req.cookies?.access_token;
     if (token) {
@@ -87,6 +93,9 @@ export const getListing = async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (error instanceof MongooseError) {
+      next(errorHandler(500, "Mongo Server Error", "/auth/signin"));
+    }
     next(error);
   }
 };
@@ -103,7 +112,7 @@ export const fetchListing = async (req, res, next) => {
 };
 
 /*
-Delets the user listing.
+Deletes the user listing.
 This currently does not delete the images associated with the listing ;(
 */
 export const deleteListing = async (req, res, next) => {
@@ -135,6 +144,12 @@ export const deleteListing = async (req, res, next) => {
   }
 };
 
+/**
+ * Updates the user listing respecting the Listing schema.
+ * @param {HttpRequest} req Express HTTP request
+ * @param {HttpResponse} res Express HTTP response
+ * @param {ExpressMiddleware} next The next middleware to execute
+ */
 export const updateListing = async (req, res, next) => {
   try {
     if (!isValidObjectId(req.params.listingId)) {
@@ -146,18 +161,28 @@ export const updateListing = async (req, res, next) => {
 
     if (!listing) {
       return next(
-        errorHandler(404, `Listing ${req.params.listingId} not found!`)
+        errorHandler(
+          404,
+          `Listing ${req.params.listingId} not found!`,
+          "/update/:listingId"
+        )
       );
     }
 
     if (listing.userRef !== userId) {
       return next(
-        errorHandler(401, "Illegal! Listing specified does not belong to user.")
+        errorHandler(
+          401,
+          "Illegal! Listing specified does not belong to user.",
+          "/update/:listingId"
+        )
       );
     }
 
     const data = JSON.parse(JSON.stringify(req.body));
-    const { error, value } = validateListingSchema.validate(data);
+    const { error, value } = validateUpdateListingSchema.validate(data);
+
+    console.log(value);
     if (error) {
       console.log(error);
       return next(errorHandler(400, error.details[0].message));

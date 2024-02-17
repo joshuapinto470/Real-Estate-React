@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export const signup = async (req, res, next) => {
   try {
@@ -20,6 +22,9 @@ export const signup = async (req, res, next) => {
       .status(200)
       .json({ success: true, user: rest });
   } catch (err) {
+    if (err instanceof mongoose.MongooseError) {
+      next(errorHandler(500, 'Mongo Server Error', '/auth/signin'));
+    }
     next(err);
   }
 };
@@ -47,6 +52,9 @@ export const signin = async (req, res, next) => {
         user: userExists,
       });
   } catch (err) {
+    if (err instanceof mongoose.MongooseError) {
+      next(errorHandler(500, 'Mongo Server Error', '/auth/signin'));
+    }
     next(err);
   }
 };
