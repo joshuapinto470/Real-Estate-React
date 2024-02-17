@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -125,13 +126,12 @@ const CreateListing = () => {
                     default:
                         console.warn(res);
                         throw new Error("Error request " + res.status);
-                        break;
                 }
 
                 // throw new Error("Error request: " + res.status);
             }
             const data = await res.json();
-            if (data.success === false) {
+            if (!data.success) {
                 setError(data);
                 setLoading(false);
                 return;
@@ -353,7 +353,7 @@ const CreateListing = () => {
                     >
                         Create Listing
                     </button>
-                    {/* {error && <p className='text-white p-2 rounded-md text-sm text-center bg-red-600 max-w-fit mx-auto'>⚠️ {error}</p>} */}
+                    {error && <p className='text-white p-2 rounded-md text-sm text-center bg-red-600 max-w-fit mx-auto'>⚠️ {error.message}</p>}
                 </div>
             </form>
         </main>

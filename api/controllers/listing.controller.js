@@ -158,11 +158,25 @@ export const updateListing = async (req, res, next) => {
 
     const data = JSON.parse(JSON.stringify(req.body));
     const { error, value } = validateListingSchema.validate(data);
-    console.log(value);
     if (error) {
       console.log(error);
       return next(errorHandler(400, error.details[0].message));
     }
+
+    const updatedListing = listing.updateOne(
+      {
+        $set: {
+          name: value.name,
+          description: value.description,
+          address: value.address,
+          regularPrice: value.regularPrice,
+          discountedPrice: value.discountedPrice,
+        },
+      },
+      { runValidators: true, new: true }
+    );
+
+    return res.status(200).json({ success: true, data: updatedListing });
   } catch (error) {
     next(error);
   }
