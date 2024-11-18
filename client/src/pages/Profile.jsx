@@ -140,8 +140,8 @@ const Profile = () => {
       if (formData.password !== formData.password_confirm) {
         setPassMatch("no-match");
         setTimeout(() => {
-            setPassMatch(null);
-          }, 2000);
+          setPassMatch(null);
+        }, 2000);
         return;
       }
       setPassMatch("match");

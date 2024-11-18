@@ -24,11 +24,8 @@ export const uploadToFirebase = async function (file) {
 
     return new Promise((resolve, reject) => {
       uploadBytes(fileRef, buffer, metadata)
-        .then((snapshot) => {
-          // console.log("Uploaded", snapshot.metadata.size, "bytes.");
-          // console.log("File metadata:", snapshot.metadata);
-          // Let's get a download URL for the file.
-          getDownloadURL(snapshot.ref).then(function (url) {
+        .then(snapshot => {
+          getDownloadURL(snapshot.ref).then(url => {
             resolve(url);
           });
         })
